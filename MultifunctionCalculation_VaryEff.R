@@ -1,17 +1,23 @@
 #source("SIH code_PLT.r") #the SIH model code
 require(vegan)
-#SIH_data<-sapply(DispV,SIH_function,species=nspecies,patches=npatches,eff_vary=T,eff_values=eff_values)
+
 
 nspecies<-9 #the number of species
 npatches<-30 #the number of patches
 nfunctions<-1 #the number of functions #CURRENTLY ONLY LOOKING AT PRODUCTION OF 1 FUNCTION
 function_overlap<-0.5 #the amount of functional overlap
+nreplicates<-5
 
 DispV<-c(0.0001,0.0005,0.001,0.005,0.01,0.05,0.1,0.5,1) #the dispersal rates 
 
 #runs the SIH model at all dispersal rates in DispV and saves the abundances and productivity in a list
+
+for(j in 1:nreplicates){
 eff_values<-rnorm(nspecies,mean=0.2,sd=0.005)
-SIH_data<-sapply(DispV,SIH_function,species=nspecies,patches=npatches)
+SIH_data[j]<-sapply(DispV,SIH_function,species=nspecies,patches=npatches,eff_vary=T,eff_values=eff_values)	
+}
+#SIH_data<-sapply(DispV,SIH_function,species=nspecies,patches=npatches,eff_vary=T,eff_values=eff_values)
+#SIH_data<-sapply(DispV,SIH_function,species=nspecies,patches=npatches)
 
 #define traits#### - I have added this to make some but you can define your traits any way you like
 MTraits<-t(matrix(runif(nspecies*nfunctions)*rbinom(nspecies*nfunctions,1,function_overlap),nspecies,nfunctions)) #no structure 
@@ -20,8 +26,11 @@ MTraits<-t(matrix(runif(nspecies*nfunctions)*rbinom(nspecies*nfunctions,1,functi
 #MTraits[3,]<-c(0,0,0,0,0,0,1,1,1)
 #print(MTraits) #just shows the traits
 
+#Version that does not allow for replicates
+#Function_rates<-data.frame(Rate=NA,Function=factor(1:nfunctions),Dispersal=rep(DispV,each=nfunctions),Scale=rep(c("Local","Regional"),Replicate Number=factor(1:nreplicates),each=nreplicates*nfunctions*length(DispV))) #storage dataframe for functional rates
 
-Function_rates<-data.frame(Rate=NA,Function=factor(1:nfunctions),Dispersal=rep(DispV,each=nfunctions),Scale=rep(c("Local","Regional"),each=nfunctions*length(DispV))) #storage dataframe for functional rates
+#Version allowing for replicates
+Function_rates<-data.frame(Rate=NA,Function=factor(1:nfunctions),ReplicateNum=factor(1:nreplicates),Dispersal=rep(DispV,each=nfunctions*nreplicates),Scale=rep(c("Local","Regional"),each=nreplicates*nfunctions*length(DispV))) #storage dataframe for functional rates
 Function_number<-data.frame(Number=NA,Dispersal=DispV,Scale=rep(c("Local","Regional"),each=length(DispV))) #storage dataframe for functional rates
 
 for(i in 1:length(DispV)){ #loops through all dispersal rates
