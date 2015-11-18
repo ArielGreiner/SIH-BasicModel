@@ -4,13 +4,13 @@ nreplicates<-5 #number of replicates
 
 DispV<-c(0.0001,0.0005,0.001,0.005,0.01,0.05,0.1,0.5,1) #the dispersal rates 
 
-Data_storage<-data.frame(SR=NA,Biomass=NA,Biomass_CV=NA,PD=NA,MPD_abund=NA,MPD_pa=NA,MNTD_abund=NA,Dispersal=rep(DispV,each=nreplicates),ReplicateNum=factor(1:nreplicates),Scale=rep(c("Local","Regional"),each=length(DispV*nreplicates))) #building the data frame
+Data_storage<-data.frame(SR=NA,Biomass=NA,Biomass_CV=NA,PD=NA,MPD_abund=NA,MPD_pa=NA,MNTD_abund=NA,Dispersal=rep(DispV,each=nreplicates),ReplicateNum=factor(1:nreplicates),Scale=rep(c("Local","Regional"),each=length(DispV)*nreplicates)) #building the data frame
 
 for(j in 1:nreplicates){
 #runs the SIH model at all dispersal rates in DispV and saves the abundances and productivity in a list
 eff_values<-rnorm(nspecies,mean=0.2,sd=0.005)
 SIH_data<-sapply(DispV,SIH_function,species=nspecies,patches=npatches,eff_vary=T,eff_values=eff_values)
-#run until here first, this will take a few minutes
+
 
 #MPD_abund = mean pairwise distance, abundance weighted (vs pa = presence absence)
 #need to put the NAs in initially
